@@ -6,18 +6,22 @@ from card import Card
 class CardGame():
     def __init__(self) -> None:
 
+        # create 52 instances of Card and store them in a list
         cards = []
         suits = ["clubs", "diamonds", "hearts", "spades"]
         for suit in suits:
             for value in range(1,14):
                 cards.append(Card(suit, value))
         self.cards = cards
+
         self.shuffled = False
 
+        # create instances of Player and choose a user.
         self.no_of_players = 4
         self.players = [Player() for i in range(self.no_of_players)]
         self.user = choice(self.players)
 
+        # initialise an empty list so the trick can be stored
         self.trick = []
         self.trick_winner = None
 
@@ -30,6 +34,7 @@ class CardGame():
                 self.cards.remove(card)
                 self.players[i].hand.append(card)
         self.shuffled = True
+
 
     def _give_names(self):
         names = ["PLayer 1", "Player 2", "Player 3"]
@@ -85,10 +90,7 @@ class CardGame():
                         player._play_card(card)
                         print(f"You played {user_card}.")
                         break
-                    else:
-                        print("Invalid card! Try again!")
-                else:
-                    print("Invalid card! Try again!")
+                print("Invalid card! Try again!")
         else:
             for card in player.hand: # plays 2 of clubs.
                 if card.suit == "clubs" and card.value == 2:
@@ -102,10 +104,11 @@ class CardGame():
         """Plays the rest of the trick using the first card as the leading suit"""
         for player in self.players[1:]: 
             if player == self.user:
-                print("Your turn is next")
+                print("\nYour turn is next")
+                print("Your hand:")
                 player.show_hand()
                 while True: # infinite loop until player plays valid card.
-                    user_card = input("Play a card: ")
+                    user_card = input("\nPlay a card: ")
                     if player._user_check_card_in_hand(user_card):
                         card = player._get_card_from_user(user_card)
                         # check the player has a card with the same suit as the leading suit.
@@ -113,7 +116,7 @@ class CardGame():
                             # ensure player plays a card match the leading suit if possbile
                             if card.suit == self.trick[0].suit:
                                 player._play_card(card)
-                                print(f"You have played the {card.card}")
+                                print(f"You have played the {card.card}\n")
                                 break
                             else:
                                 print(f"You must play a {self.trick[0].suit}")
@@ -148,12 +151,13 @@ class CardGame():
     
 
     def _play_first_card_of_trick(self):
+        """Plays the first card of the trick, doesn't allow bot or user to play hearts"""
         self.trick.clear()
-        player = self.players[0]
+        player = self.players[0] 
         if player == self.user:
             print("You won the last trick!")
             player.show_hand()
-            while True:
+            while True: # infinite loop until player plays valid card
                 user_card = input("Play a card: ")
                 if player._user_check_card_in_hand(user_card):
                     card = player._get_card_from_user(user_card)
@@ -166,9 +170,14 @@ class CardGame():
                 else:
                     print("Invalid Card! Try Again!")
         else:
-            card = choice(player.hand)
-            player._play_card(card)
-            print(f"{player.name} has played {card.card}")
+            if player._check_only_hearts():
+                card = choice(player.hand)
+                player._play_card(card)
+                print(f"{player.name} has played {card.card}")
+            else:
+                card = choice(player._get_non_hearts())
+                player._play_card(card)
+                print(f"{player.name} has played {card.card}")
         self.trick.append(player.play)
 
     def _show_user_winnings(self):
@@ -190,16 +199,23 @@ class CardGame():
             print(f"{player.name} scored {player.score} points.")
 
                 
-            
+    def _play_trick(self):
+        trick = 2
+        while self._get_number_of_cards_in_play():
+            print(f"\n---- Trick {trick} ----\n")
+            trick += 1
+            self.get_trick_order()
+            self._play_first_card_of_trick()
+            self._play_remaining_cards_of_trick()
+            print(f"\nTrick: {[card.card for card in self.trick]}")
+            # print([card.card for card in self.trick])
+            self._get_trick_winner()
+            print(f"\n{self.trick_winner.name } has won the trick")
+            self._give_winnings_to_player()
+            self._show_user_winnings()
+            input("Press enter to play next trick:")
 
 
-
-
-
-
-
-
-    
     def play_round(self):
         # first trick
         trick = 1
@@ -211,20 +227,7 @@ class CardGame():
         self._play_remaining_cards_of_trick()
         self._get_trick_winner()
         print(f"{self.trick_winner.name} has won the first trick")
-        
-        while self._get_number_of_cards_in_play():
-            print(f"\n---- Trick {trick} ----\n")
-            trick += 1
-            self.get_trick_order()
-            self._play_first_card_of_trick()
-            self._play_remaining_cards_of_trick()
-            print("Trick:")
-            print([card.card for card in self.trick])
-            self._get_trick_winner()
-            print(f"{self.trick_winner.name } has won the trick")
-            self._give_winnings_to_player()
-            self._show_user_winnings()
-            input("Press enter to play next trick:")
+        self._play_trick()
         self._get_score()
         self._show_scores()            
 
