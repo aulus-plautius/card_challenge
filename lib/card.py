@@ -3,4 +3,4 @@ class Card():
     def __init__(self, suit, value) -> None:
         self.suit = suit
         self.value = value
-        self.card = f"{value} of {suit}"
+        self.card = f"{value} of {suit}" 
