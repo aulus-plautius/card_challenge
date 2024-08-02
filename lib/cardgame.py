@@ -50,17 +50,33 @@ class CardGame():
 
     
     def print_table(self):
-        player_o = self.user.opposite_player.name
-        player_l = self.user.previous_player.name
-        player_r = self.user.next_player.name
-        player_u = self.user.name
-        print(f"              {player_o}")
-        print("           +-----+-----+")
-        print("           |           |")
-        print(f"  {player_l} +           + {player_r}")
-        print("           |           |")
-        print("           +-----+-----+")
-        print(f"               {player_u}")
+        if self.user:
+            player_o = self.user.opposite_player.name
+            player_l = self.user.previous_player.name
+            player_r = self.user.next_player.name
+            player_u = self.user.name
+            print(f"              {player_o}")
+            print("           +-----+-----+")
+            print("           |           |")
+            print(f"  {player_l} +           + {player_r}")
+            print("           |           |")
+            print("           +-----+-----+")
+            print(f"               {player_u}")
+        else:
+            player = choice(self.players)
+            player_o = player.opposite_player.name
+            player_l = player.previous_player.name
+            player_r = player.next_player.name
+            player_u = player.name
+            print(f"              {player_o}")
+            print("           +-----+-----+")
+            print("           |           |")
+            print(f"  {player_l} +           + {player_r}")
+            print("           |           |")
+            print("           +-----+-----+")
+            print(f"               {player_u}")
+
+
 
 
     def shuffle_and_deal(self):
@@ -70,8 +86,6 @@ class CardGame():
                 card = choice(self.cards)
                 self.cards.remove(card)
                 player.hand.append(card)
-                # print(player.name)
-                # player.show_hand()
                 player = player.next_player
         self.shuffled = True
 
@@ -130,10 +144,11 @@ class CardGame():
             player = player.next_player
             if player == self.dealer:
                 break
-        user_passed_cards = [card.card for card in self.user.passed_cards]
-        print(f"\nYou have passed the {", ".join(user_passed_cards)} to {self.user.previous_player.name}")
-        user_recieved_cards = [card.card for card in self.user.next_player.passed_cards]
-        print(f"\nYou have recieved the {", ".join(user_recieved_cards)} from {self.user.next_player.name}")
+        if self.user:
+            user_passed_cards = [card.card for card in self.user.passed_cards]
+            print(f"\nYou have passed the {", ".join(user_passed_cards)} to {self.user.previous_player.name}")
+            user_recieved_cards = [card.card for card in self.user.next_player.passed_cards]
+            print(f"\nYou have recieved the {", ".join(user_recieved_cards)} from {self.user.next_player.name}")
 
     def pass_cards_right(self):
         print("\n---- Pass Three Cards To The Right ----\n")
@@ -144,10 +159,11 @@ class CardGame():
             player = player.next_player
             if player ==self.dealer:
                 break
-        user_passed_cards = [card.card for card in self.user.passed_cards]
-        print(f"\nYou have passed the {", ".join(user_passed_cards)} to {self.user.next_player.name}")
-        user_recieved_cards = [card.card for card in self.user.previous_player.passed_cards]
-        print(f"\nYou have recieved the {", ".join(user_recieved_cards)} from {self.user.previous_player.name}")
+        if self.user:
+            user_passed_cards = [card.card for card in self.user.passed_cards]
+            print(f"\nYou have passed the {", ".join(user_passed_cards)} to {self.user.next_player.name}")
+            user_recieved_cards = [card.card for card in self.user.previous_player.passed_cards]
+            print(f"\nYou have recieved the {", ".join(user_recieved_cards)} from {self.user.previous_player.name}")
 
 
     def pass_cards_opposite(self):
@@ -158,11 +174,12 @@ class CardGame():
             player.opposite_player.hand.extend(player.passed_cards)
             player = player.next_player
             if player ==self.dealer:
-                break           
-        user_passed_cards = [card.card for card in self.user.passed_cards]
-        print(f"\nYou have passed the {", ".join(user_passed_cards)} to {self.user.opposite_player.name}")
-        user_recieved_cards = [card.card for card in self.user.opposite_player.passed_cards]
-        print(f"\nYou have recieved the {", ".join(user_recieved_cards)} from {self.user.opposite_player.name}")
+                break 
+        if self.user:
+            user_passed_cards = [card.card for card in self.user.passed_cards]
+            print(f"\nYou have passed the {", ".join(user_passed_cards)} to {self.user.opposite_player.name}")
+            user_recieved_cards = [card.card for card in self.user.opposite_player.passed_cards]
+            print(f"\nYou have recieved the {", ".join(user_recieved_cards)} from {self.user.opposite_player.name}")
 
 
     def get_number_of_cards_in_play(self):
@@ -184,6 +201,7 @@ class CardGame():
 
     def play_first_card_of_first_trick(self):
         """Plays the 2 of clubs card automatically or allows user to input the card"""
+        self.trick.clear()
         if self.trick_winner == self.user:
             print("You have the 2 of clubs.")
             while True: # infinite loop until player plays valid card.
@@ -321,6 +339,7 @@ class CardGame():
     def reset_round(self):
         for player in self.players:
             self.cards.extend(player.won_cards)
+            player.won_cards.clear()
             
         
             

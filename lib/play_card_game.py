@@ -6,7 +6,6 @@ game = CardGame()
 trick = 1
 game.give_names()
 game.generate_next_player()
-game.shuffle_and_deal()
 print("\n-------- WELCOME TO HEARTS ---------\n")
 game.print_table()
 game_round = 0
@@ -44,7 +43,6 @@ while game.get_maximum_score() < 100:
         input("\n---- Press Enter To Play Next Trick ----")
     print("---- Current Scores ----")
     game.get_score()
-
     game.show_scores()
     game.reset_round()
 print("----- Game Over -----")
